@@ -6,11 +6,15 @@ using System.Net;
 using System.Threading.Tasks;
 using SignalR.Client;
 
-namespace crank {
-    class Program {
-        static void Main(string[] args) {
+namespace crank
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
             Console.WriteLine("Crank v{0}", typeof(Program).Assembly.GetName().Version);
-            if (args.Length < 2) {
+            if (args.Length < 2)
+            {
                 Console.WriteLine("Usage: crank [url] [numclients]");
                 return;
             }
@@ -26,26 +30,33 @@ namespace crank {
 
             var sw = Stopwatch.StartNew();
 
-            Task.Factory.StartNew(() => {
-                Parallel.For(0, clients, i => {
-                    try {
+            Task.Factory.StartNew(() =>
+            {
+                Parallel.For(0, clients, i =>
+                {
+                    try
+                    {
                         var connection = new Connection(url);
-                        connection.Received += data => {
+                        connection.Received += data =>
+                        {
                             Console.WriteLine(data);
                         };
 
-                        connection.Error += e => {
+                        connection.Error += e =>
+                        {
                             Console.WriteLine("ERROR: Client {0}, {1}", i, e.GetBaseException());
                         };
 
-                        connection.Closed += () => {
+                        connection.Closed += () =>
+                        {
                             Console.WriteLine("CLOSED: {0}", i);
                         };
 
                         connection.Start().Wait();
                         connections.Add(connection);
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                         Console.WriteLine("Failed to start client {0}. {1}", i, e);
                     }
                 });
@@ -63,7 +74,8 @@ namespace crank {
             Console.WriteLine("Stopped connections: {0}", connections.Count(c => !c.IsActive));
         }
 
-        private static void OnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e) {
+        private static void OnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
             Console.WriteLine(e.Exception.GetBaseException());
             e.SetObserved();
         }
